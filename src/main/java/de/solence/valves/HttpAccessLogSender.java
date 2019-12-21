@@ -16,7 +16,13 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * 
+ * Sends messages of log events to endpoint.
+ * <p>
+ * Tries to send multiple events at once to reduce overhead and retries in case
+ * message delivery has not been successful. This guarantees that messages are
+ * delivered even with temporary connection problems. The only way to lose log
+ * events is if the endpoint is permanently unreachable or the application is
+ * interrupted.
  * 
  * @author Robin Seggelmann
  *
@@ -31,37 +37,41 @@ public class HttpAccessLogSender implements Runnable {
 	/**
 	 * Constructor.
 	 * 
-	 * @param config
-	 *                   The {@link HttpAccessLogConfiguration} for connection
-	 *                   details.
-	 * @param queue
-	 *                   The event queue to send messages from.
+	 * @param config The {@link HttpAccessLogConfiguration} for connection details.
+	 * @param queue  The event queue to send messages from.
 	 */
-	public HttpAccessLogSender(HttpAccessLogConfiguration config,
-			BlockingQueue<HttpAccessLogEvent> queue) {
+	public HttpAccessLogSender(HttpAccessLogConfiguration config, BlockingQueue<HttpAccessLogEvent> queue) {
 		this.config = config;
 		this.target = config.getTarget();
 		this.queue = queue;
 	}
 
+	/**
+	 * Perform sending while queue is not empty. Multiple log events are
+	 * concatenated to a single message to avoid overhead. Tries to send a message
+	 * until it has been delivered or the application is interrupted.
+	 */
 	@Override
 	public void run() {
 		while (!queue.isEmpty()) {
 			// Concatenate multiple events for a message
 			String message = concatenateEvents();
 			System.out.println(message);
-			
+
 			// Try to send message
 			int waitBeforeRetry = 1;
 
-			// Never give up
-			while (!sendMessage(message)) {
+			// Never give up, unless interrupted
+			while (!sendMessage(message) && !Thread.interrupted()) {
 				// If message could not be sent, the endpoint is likely down, so
 				// wait before retrying.
 				try {
 					TimeUnit.SECONDS.sleep(waitBeforeRetry);
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
+					// Thread has been interrupted, so give up. This likely results in lost events,
+					// but there is not much that can be done to avoid that.
+					return;
 				}
 
 				// Increase wait time to avoid spamming an unvailable endpoint,
@@ -88,6 +98,8 @@ public class HttpAccessLogSender implements Runnable {
 				event = queue.poll(100, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
+				// Interrupt has been received so don't wait for more events and continue
+				// sending the message.
 			}
 
 			// If no events are left, continue to sending.
@@ -112,11 +124,9 @@ public class HttpAccessLogSender implements Runnable {
 
 			// Allow HTTPS and HTTP
 			if ("https".equals(config.getEndpointUrl().getProtocol())) {
-				conn = (HttpsURLConnection) config.getEndpointUrl()
-						.openConnection();
+				conn = (HttpsURLConnection) config.getEndpointUrl().openConnection();
 			} else {
-				conn = (HttpURLConnection) config.getEndpointUrl()
-						.openConnection();
+				conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
 			}
 
 			// Connection properties
@@ -126,8 +136,7 @@ public class HttpAccessLogSender implements Runnable {
 
 			// Headers
 			conn.setRequestProperty("Content-Type", target.getContentType());
-			conn.setRequestProperty("Authorization",
-					target.getAuthenticationHeader(config.getAuthToken()));
+			conn.setRequestProperty("Authorization", target.getAuthenticationHeader(config.getAuthToken()));
 			conn.setRequestMethod("POST");
 
 			// Send message
