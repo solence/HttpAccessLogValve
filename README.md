@@ -1,5 +1,7 @@
 # HTTP Access Log Valve
 
+![build status](https://github.com/solence/HttpAccessLogValve/workflows/Java%20CI/badge.svg)
+
 TODO: Intro
 
 ## How to use
@@ -16,15 +18,36 @@ TODO
 
 The following table lists all possible configuration parameters. They can either be set by JVM parameter or environment variable. If both are set, the JVM parameter is used.
 
+### Mandatory parameters
+
 |JVM Parameter|Environment variable|Description|
 |-|-|-|
-|httpaccesslogvalve.url|HTTPACCESSLOGVALVE_URL|TODO|
-|httpaccesslogvalve.token|HTTPACCESSLOGVALVE_TOKEN|TODO|
-|httpaccesslogvalve.host|HTTPACCESSLOGVALVE_HOST|TODO|
+|httpaccesslogvalve.url|HTTPACCESSLOGVALVE_URL|The URL of the HTTP/HTTPS endpoint to sent to.|
+|httpaccesslogvalve.token|HTTPACCESSLOGVALVE_TOKEN|The token to use for authentication against the endpoint.|
+
+### Optional parameters
+
+|JVM Parameter|Environment variable|Description|
+|-|-|-|
+|httpaccesslogvalve.host|HTTPACCESSLOGVALVE_HOST|The name of the host from which the data is sent. Defaults to the local hostname.|
 |httpaccesslogvalve.index|HTTPACCESSLOGVALVE_INDEX|TODO|
 |httpaccesslogvalve.source|HTTPACCESSLOGVALVE_SOURCE|TODO|
-|httpaccesslogvalve.queue|HTTPACCESSLOGVALVE_QUEUE|TODO|
-|httpaccesslogvalve.timeout|HTTPACCESSLOGVALVE_TIMEOUT|TODO|
+|httpaccesslogvalve.queue|HTTPACCESSLOGVALVE_QUEUE|The length of the queue of log events waiting to be sent. A longer queue is more likely to guarantee delivery of log events, when the network is slow or the endpoint unstable. It also increases memory consumtion. Log events will be lost when the queue is full. Defaults to 1000. |
+|httpaccesslogvalve.timeout|HTTPACCESSLOGVALVE_TIMEOUT|The time to wait after a shutdown has been initiated, until log events still in the queue have been sent. Defaults to 30 seconds|
+
+### Example with JVM parameters
+
+```sh
+export CATALINA_OPTS="${CATALINA_OPTS} -Dhttpaccesslogvalve.url=http://localhost:8088/services/collector"
+export CATALINA_OPTS="${CATALINA_OPTS} -Dhttpaccesslogvalve.token=123-456-789"
+```
+
+### Example with environment variables
+
+```sh
+export HTTPACCESSLOGVALVE_URL=http://localhost:8088/services/collector
+export HTTPACCESSLOGVALVE_TOKEN=123-456-789
+```
 
 ## License
 
