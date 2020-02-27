@@ -21,6 +21,7 @@ public class HttpAccessLogEvent {
 	private final String requestMethod;
 	private final String requestUri;
 	private final String remoteUser;
+	private final String sessionId;
 	private final String userAgent;
 	private final int status;
 	private final int bytes;
@@ -49,6 +50,7 @@ public class HttpAccessLogEvent {
 		this.requestMethod = request.getMethod();
 		this.requestUri = request.getRequestURI();
 		this.remoteUser = request.getRemoteUser();
+		this.sessionId = request.getRequestedSessionId();
 		this.userAgent = request.getHeader("User-Agent");
 		this.status = response.getStatus();
 		this.bytes = response.getBufferSize();
@@ -85,6 +87,10 @@ public class HttpAccessLogEvent {
 
 	public String getRemoteUser() {
 		return remoteUser;
+	}
+
+	public String getSessionId() {
+		return sessionId;
 	}
 
 	public String getUserAgent() {

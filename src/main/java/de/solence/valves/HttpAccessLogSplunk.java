@@ -42,8 +42,7 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 
 		sb.append('{');
 		// metadata
-		double epoch = event.getTime().atZone(ZoneId.systemDefault())
-				.toInstant().toEpochMilli() / 1000.0;
+		double epoch = event.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000.0;
 
 		append(sb, "time", String.format(Locale.US, "%.3f", epoch));
 		sb.append(',');
@@ -74,6 +73,12 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 			append(sb, "user", "-");
 		}
 		sb.append(',');
+		if (event.getSessionId() != null) {
+			append(sb, "sessionId", event.getSessionId());
+		} else {
+			append(sb, "sessionId", "-");
+		}
+		sb.append(',');
 		if (event.getUserAgent() != null) {
 			append(sb, "userAgent", event.getUserAgent());
 		} else {
@@ -92,11 +97,11 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	}
 
 	/**
-	 * Check if the response from Splunk indicates successful delivery of the
-	 * event message.
+	 * Check if the response from Splunk indicates successful delivery of the event
+	 * message.
 	 */
 	public boolean isResponseOk(int status, String content) {
-		// TODO: parse response
+		// TODO: parse response: 200: {"text":"Success","code":0}
 		System.out.println(status + ": " + content);
 		return true;
 
