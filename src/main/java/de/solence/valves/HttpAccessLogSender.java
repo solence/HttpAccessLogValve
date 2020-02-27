@@ -1,19 +1,7 @@
 package de.solence.valves;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.catalina.AccessLog;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * Sends messages of log events to endpoint.
@@ -28,10 +16,9 @@ import org.apache.juli.logging.LogFactory;
  *
  */
 public class HttpAccessLogSender implements Runnable {
-	private static final Log log = LogFactory.getLog(AccessLog.class);
 	private static final int MAX_EVENTS_PER_MESSAGE = 25;
 	private final HttpAccessLogConfiguration config;
-	private final HttpAccessLogTarget target;
+	private final HttpAccessLogHttpConn conn;
 	private final BlockingQueue<HttpAccessLogEvent> queue;
 
 	/**
@@ -42,7 +29,7 @@ public class HttpAccessLogSender implements Runnable {
 	 */
 	public HttpAccessLogSender(HttpAccessLogConfiguration config, BlockingQueue<HttpAccessLogEvent> queue) {
 		this.config = config;
-		this.target = config.getTarget();
+		this.conn = new HttpAccessLogHttpConn(config);
 		this.queue = queue;
 	}
 
@@ -62,7 +49,7 @@ public class HttpAccessLogSender implements Runnable {
 			int waitBeforeRetry = 1;
 
 			// Never give up, unless interrupted
-			while (!sendMessage(message) && !Thread.interrupted()) {
+			while (!conn.sendMessage(message) && !Thread.interrupted()) {
 				// If message could not be sent, the endpoint is likely down, so
 				// wait before retrying.
 				try {
@@ -111,61 +98,11 @@ public class HttpAccessLogSender implements Runnable {
 				message.append(',');
 			}
 
-			message.append(target.getMessage(event));
+			message.append(config.getTarget().getMessage(event));
 		}
 		message.append(']');
 
 		return message.toString();
-	}
-
-	private boolean sendMessage(String message) {
-		try {
-			HttpURLConnection conn;
-
-			// Allow HTTPS and HTTP
-			if ("https".equals(config.getEndpointUrl().getProtocol())) {
-				conn = (HttpsURLConnection) config.getEndpointUrl().openConnection();
-			} else {
-				conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
-			}
-
-			// Connection properties
-			conn.setConnectTimeout(60000);
-			conn.setReadTimeout(60000);
-			conn.setDoOutput(true);
-
-			// Headers
-			conn.setRequestProperty("Content-Type", target.getContentType());
-			conn.setRequestProperty("Authorization", target.getAuthenticationHeader(config.getAuthToken()));
-			conn.setRequestMethod("POST");
-
-			// Send message
-			try (OutputStream os = conn.getOutputStream()) {
-				os.write(message.getBytes(StandardCharsets.UTF_8));
-			}
-
-			// Get response
-			String response = null;
-			try (InputStream is = conn.getInputStream()) {
-				response = readInputStream(is);
-			}
-
-			return target.isResponseOk(conn.getResponseCode(), response);
-
-		} catch (IOException e) {
-			log.error(e.getMessage());
-			return false;
-		}
-	}
-
-	private String readInputStream(InputStream is) throws IOException {
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
-		byte[] buffer = new byte[1024];
-		int length;
-		while ((length = is.read(buffer)) != -1) {
-			result.write(buffer, 0, length);
-		}
-		return result.toString(StandardCharsets.UTF_8.name());
 	}
 
 }
