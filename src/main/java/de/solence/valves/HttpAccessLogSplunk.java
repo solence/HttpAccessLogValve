@@ -71,10 +71,8 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * message.
 	 */
 	public boolean isResponseOk(int status, String content) {
-		// TODO: parse response: 200: {"text":"Success","code":0}
-		System.out.println(status + ": " + content);
-		return true;
-
+		// Splunk should return status 200 and "text":"Success"
+		return (status == 200 && content != null && content.contains("Success"));
 	}
 
 }
