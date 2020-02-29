@@ -2,17 +2,22 @@
 
 ![build status](https://github.com/solence/HttpAccessLogValve/workflows/Java%20CI/badge.svg)
 
-TODO: Intro
+Modern deployments often use central log aggregators instead of individual log files, especially with containers. By default, Tomcat/TomEE only writes the access logs to a file, so an additional process needs to monitor the file and forward the data to an aggregator.
+
+This library provides a log valve for Tomcat/TomEE to send access log data directly to an HTTP endpoint. This makes Tomcat/TomEE deployments in containers much easier, because there is no need for a forwarder process. In addition, no parsing configuration for raw data is necessary, because the data is sent in JSON format.
+
 
 ## How to use
 
-TODO
+Download the latest release and place the JAR in `$CATALINA_HOME/lib` or `$CATALINA_BASE/lib`, depending whether it should be used for a single or multiple instances. This library is designed to not depend on any other libraries to not interfere with the applications deployed on the Tomcat/TomEE.
+
+To activate this log valve, replace the existing log valve configuration or add a new entry in `$CATALINA_BASE/conf/server.xml` in the `<Host>` section:
 
 ```xml
 <Valve className="de.solence.valves.HttpAccessLogValve" />
 ```
 
-TODO
+The necessary configuration needs to be provided by JVM parameters or environemnt variables.
 
 ## Configuration
 

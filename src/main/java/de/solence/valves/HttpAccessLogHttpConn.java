@@ -14,8 +14,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * 
- * 
+ * Handles the HTTP(S) connection to the logging endpoint.
  * 
  * @author Robin Seggelmann
  *
