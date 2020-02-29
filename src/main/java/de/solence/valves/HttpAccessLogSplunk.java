@@ -17,6 +17,7 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	/**
 	 * Returns the content type, always use JSON.
 	 */
+	@Override
 	public String getContentType() {
 		return "application/json";
 	}
@@ -24,8 +25,17 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	/**
 	 * Creates a Splunk authentication header.
 	 */
+	@Override
 	public String getAuthenticationHeader(String token) {
 		return "Splunk " + token;
+	}
+
+	/**
+	 * Limit to 25 events per message to avoid large messages.
+	 */
+	@Override
+	public int getEventsPerMessage() {
+		return 25;
 	}
 
 	/**
@@ -34,6 +44,7 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * 
 	 * @return A JSON message with a Splunk event.
 	 */
+	@Override
 	public String getMessage(HttpAccessLogEvent event) {
 		HttpAccessLogJsonBuilder json = new HttpAccessLogJsonBuilder();
 
@@ -70,6 +81,7 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * Check if the response from Splunk indicates successful delivery of the event
 	 * message.
 	 */
+	@Override
 	public boolean isResponseOk(int status, String content) {
 		// Splunk should return status 200 and "text":"Success"
 		return (status == 200 && content != null && content.contains("Success"));

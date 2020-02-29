@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class HttpAccessLogSender implements Runnable {
-	private static final int MAX_EVENTS_PER_MESSAGE = 25;
 	private final HttpAccessLogConfiguration config;
 	private final HttpAccessLogHttpConn conn;
 	private final BlockingQueue<HttpAccessLogEvent> queue;
@@ -74,7 +73,7 @@ public class HttpAccessLogSender implements Runnable {
 	private String concatenateEvents() {
 		StringBuilder message = new StringBuilder();
 		message.append('[');
-		for (int i = 0; i < MAX_EVENTS_PER_MESSAGE; i++) {
+		for (int i = 0; i < config.getTarget().getEventsPerMessage(); i++) {
 			// Get an event from the queue. At least one should be in it,
 			// otherwise we wouldn't have made it here. Wait up to 100 ms
 			// for further events to avoid sending single event, like Nagle's
