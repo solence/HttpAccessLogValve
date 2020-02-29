@@ -8,14 +8,14 @@ package de.solence.valves;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogJSONBuilder {
+public class HttpAccessLogJsonBuilder {
 	private StringBuilder sb;
 	private boolean needSeparator;
 
 	/**
 	 * Constructor.
 	 */
-	public HttpAccessLogJSONBuilder() {
+	public HttpAccessLogJsonBuilder() {
 		sb = new StringBuilder();
 		needSeparator = false;
 	}
@@ -27,7 +27,7 @@ public class HttpAccessLogJSONBuilder {
 	 * @param value The value as {@link String}.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder append(String key, String value) {
+	public HttpAccessLogJsonBuilder append(String key, String value) {
 		addSeparator();
 		sb.append('"').append(key).append('"');
 		sb.append(':');
@@ -43,7 +43,7 @@ public class HttpAccessLogJSONBuilder {
 	 * @param value The value as {@link Long}.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder append(String key, long value) {
+	public HttpAccessLogJsonBuilder append(String key, long value) {
 		addSeparator();
 		sb.append('"').append(key).append('"');
 		sb.append(':');
@@ -60,7 +60,7 @@ public class HttpAccessLogJSONBuilder {
 	 * @param key The name of the object.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder startObject(String key) {
+	public HttpAccessLogJsonBuilder startObject(String key) {
 		addSeparator();
 		if (key != null) {
 			sb.append('"').append(key).append('"');
@@ -76,7 +76,7 @@ public class HttpAccessLogJSONBuilder {
 	 * 
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder endObject() {
+	public HttpAccessLogJsonBuilder endObject() {
 		sb.append('}');
 		needSeparator = true;
 		return this;
@@ -90,7 +90,7 @@ public class HttpAccessLogJSONBuilder {
 	 * @param key The name of the object.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder startArray(String key) {
+	public HttpAccessLogJsonBuilder startArray(String key) {
 		addSeparator();
 		if (key != null) {
 			sb.append('"').append(key).append('"');
@@ -106,7 +106,7 @@ public class HttpAccessLogJSONBuilder {
 	 * 
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJSONBuilder endArray() {
+	public HttpAccessLogJsonBuilder endArray() {
 		sb.append(']');
 		needSeparator = true;
 		return this;

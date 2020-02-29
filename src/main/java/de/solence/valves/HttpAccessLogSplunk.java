@@ -35,7 +35,7 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * @return A JSON message with a Splunk event.
 	 */
 	public String getMessage(HttpAccessLogEvent event) {
-		HttpAccessLogJSONBuilder json = new HttpAccessLogJSONBuilder();
+		HttpAccessLogJsonBuilder json = new HttpAccessLogJsonBuilder();
 
 		double epoch = event.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000.0;
 

@@ -6,8 +6,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
 /**
- * Stores a logging event and creates an appropriate message format for the
- * target logging system. Currently, only Splunk is supported.
+ * Stores a logging event.
  * 
  * @author Robin Seggelmann
  *
