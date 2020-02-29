@@ -43,7 +43,6 @@ public class HttpAccessLogSender implements Runnable {
 		while (!queue.isEmpty()) {
 			// Concatenate multiple events for a message
 			String message = concatenateEvents();
-			System.out.println(message);
 
 			// Try to send message
 			int waitBeforeRetry = 1;
