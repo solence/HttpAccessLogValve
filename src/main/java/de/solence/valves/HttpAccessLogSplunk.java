@@ -35,65 +35,35 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * @return A JSON message with a Splunk event.
 	 */
 	public String getMessage(HttpAccessLogEvent event) {
-		// Use a StringBuilder here instead of a generic JSON library. Only the
-		// bare minimum JSON is needed, so this avoids dependencies and
-		// minimizes processing time added by generic parsers.
-		StringBuilder sb = new StringBuilder();
+		HttpAccessLogJSONBuilder json = new HttpAccessLogJSONBuilder();
 
-		sb.append('{');
-		// metadata
 		double epoch = event.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000.0;
 
-		append(sb, "time", String.format(Locale.US, "%.3f", epoch));
-		sb.append(',');
+		// metadata
+		json.startObject(null);
+		json.append("time", String.format(Locale.US, "%.3f", epoch));
 		if (event.getIndex() != null) {
-			append(sb, "index", event.getIndex());
-			sb.append(',');
+			json.append("index", event.getIndex());
 		}
-		append(sb, "host", event.getHost());
-		sb.append(',');
-		append(sb, "source", event.getSource());
-		sb.append(',');
-		append(sb, "sourcetype", "access");
-		sb.append(',');
+		json.append("host", event.getHost());
+		json.append("source", event.getSource());
+		json.append("sourcetype", "access");
 		// begin event
-		sb.append('"').append("event").append('"');
-		sb.append(':');
-		sb.append('{');
+		json.startObject("event");
 		// actual data
-		append(sb, "remoteHost", event.getRemoteHost());
-		sb.append(',');
-		append(sb, "method", event.getRequestMethod());
-		sb.append(',');
-		append(sb, "uri", event.getRequestUri());
-		sb.append(',');
-		if (event.getRemoteUser() != null) {
-			append(sb, "user", event.getRemoteUser());
-		} else {
-			append(sb, "user", "-");
-		}
-		sb.append(',');
-		if (event.getSessionId() != null) {
-			append(sb, "sessionId", event.getSessionId());
-		} else {
-			append(sb, "sessionId", "-");
-		}
-		sb.append(',');
-		if (event.getUserAgent() != null) {
-			append(sb, "userAgent", event.getUserAgent());
-		} else {
-			append(sb, "userAgent", "-");
-		}
-		sb.append(',');
-		append(sb, "status", event.getStatus());
-		sb.append(',');
-		append(sb, "bytes", event.getBytes());
-		sb.append(',');
-		append(sb, "processingTime", event.getProcessingTime());
-		sb.append('}');
-		sb.append('}');
+		json.append("remoteHost", event.getRemoteHost());
+		json.append("method", event.getRequestMethod());
+		json.append("uri", event.getRequestUri());
+		json.append("user", (event.getRemoteUser() != null) ? event.getRemoteUser() : "-");
+		json.append("sessionId", (event.getSessionId() != null) ? event.getSessionId() : "-");
+		json.append("userAgent", (event.getUserAgent() != null) ? event.getUserAgent() : "-");
+		json.append("status", event.getStatus());
+		json.append("bytes", event.getBytes());
+		json.append("processingTime", event.getProcessingTime());
+		json.endObject();
+		json.endObject();
 
-		return sb.toString();
+		return json.toString();
 	}
 
 	/**
@@ -105,18 +75,6 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 		System.out.println(status + ": " + content);
 		return true;
 
-	}
-
-	private void append(StringBuilder sb, String key, String value) {
-		sb.append('"').append(key).append('"');
-		sb.append(':');
-		sb.append('"').append(value).append('"');
-	}
-
-	private void append(StringBuilder sb, String key, long value) {
-		sb.append('"').append(key).append('"');
-		sb.append(':');
-		sb.append(value);
 	}
 
 }
