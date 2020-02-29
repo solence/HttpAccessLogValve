@@ -48,9 +48,8 @@ public class HttpAccessLogConfiguration {
 	 * <p>
 	 * Processes the provided configuration.
 	 * 
-	 * @throws LifecycleException
-	 *                                Thrown for invalid or missing
-	 *                                configuration values.
+	 * @throws LifecycleException Thrown for invalid or missing configuration
+	 *                            values.
 	 */
 	public HttpAccessLogConfiguration() throws LifecycleException {
 		// Currently only Splunk is supported
@@ -65,15 +64,18 @@ public class HttpAccessLogConfiguration {
 		}
 
 		// Check if protocol is either HTTP or HTTPS
-		if (!"http".equals(endpointUrl.getProtocol())
-				&& !"https".equals(endpointUrl.getProtocol())) {
-			throw new LifecycleException(new IllegalStateException("Protocol "
-					+ endpointUrl.getProtocol() + " not supported"));
+		if (!"http".equals(endpointUrl.getProtocol()) && !"https".equals(endpointUrl.getProtocol())) {
+			throw new LifecycleException(
+					new IllegalStateException("Protocol " + endpointUrl.getProtocol() + " not supported"));
 		}
 
-		// Get default value for host, either local hostname or if that fails,
-		// default string
-		// If no host has been configured, fall back to local host name
+		// Warn when using unencrypted HTTP
+		if ("http".contentEquals(endpointUrl.getProtocol())) {
+			log.warn("Using unencrypted http, consider switching to https");
+		}
+
+		// Get default value for host, either local hostname, or if that fails,
+		// use a default string
 		String hostDefaultString;
 		try {
 			hostDefaultString = InetAddress.getLocalHost().getHostName();
@@ -83,42 +85,31 @@ public class HttpAccessLogConfiguration {
 		}
 
 		authToken = getJvmOrEnvValue("token", null, true);
-
 		host = getJvmOrEnvValue("host", hostDefaultString, false);
-
 		index = getJvmOrEnvValue("index", null, false);
-
 		source = getJvmOrEnvValue("source", "HttpAccessLogValve", false);
 
-		queueLength = Integer
-				.parseUnsignedInt(getJvmOrEnvValue("queue", "1000", false));
-		timeout = Integer
-				.parseUnsignedInt(getJvmOrEnvValue("timeout", "30", false));
+		queueLength = Integer.parseUnsignedInt(getJvmOrEnvValue("queue", "1000", false));
+		timeout = Integer.parseUnsignedInt(getJvmOrEnvValue("timeout", "30", false));
 	}
 
-	private String getJvmOrEnvValue(String name, String defaultValue,
-			boolean mandatory) throws LifecycleException {
-
+	private String getJvmOrEnvValue(String name, String defaultValue, boolean mandatory) throws LifecycleException {
 		String jvmName = "httpaccesslogvalve." + name.toLowerCase();
 		String envName = "HTTPACCESSLOGVALVE_" + name.toUpperCase();
 
 		// Try to read JVM parameter
-		if (System.getProperties().containsKey(jvmName)
-				&& !System.getProperty(jvmName).isEmpty()) {
+		if (System.getProperties().containsKey(jvmName) && !System.getProperty(jvmName).isEmpty()) {
 			return System.getProperty(jvmName);
 		}
 
 		// Try to read environment parameter
-		if (System.getenv().containsKey(envName)
-				&& !System.getenv(envName).isEmpty()) {
+		if (System.getenv().containsKey(envName) && !System.getenv(envName).isEmpty()) {
 			return System.getenv(envName);
 		}
 
 		if (mandatory) {
-			throw new LifecycleException(new IllegalStateException(
-					"Cannot continue without either JVM parameter " + jvmName
-							+ " or environment variable " + envName
-							+ " configured"));
+			throw new LifecycleException(new IllegalStateException("Cannot continue without either JVM parameter "
+					+ jvmName + " or environment variable " + envName + " configured"));
 		}
 
 		return defaultValue;
@@ -126,8 +117,8 @@ public class HttpAccessLogConfiguration {
 
 	/**
 	 * Returns the implementation object of the target logging system. Allows to
-	 * support different message formats and authentication methods for
-	 * different systems.
+	 * support different message formats and authentication methods for different
+	 * systems.
 	 * 
 	 * @return The implementation of the target system.
 	 */
@@ -138,8 +129,8 @@ public class HttpAccessLogConfiguration {
 	/**
 	 * Returns the URL of the HTTP endpoint.
 	 * <p>
-	 * Must be configured with JVM parameter <code>httpaccesslogvalve.url</code>
-	 * or environment variable <code>HTTPACCESSLOGVALVE_URL</code>.
+	 * Must be configured with JVM parameter <code>httpaccesslogvalve.url</code> or
+	 * environment variable <code>HTTPACCESSLOGVALVE_URL</code>.
 	 * 
 	 * @return The URL of the HTTP endpoint.
 	 */
@@ -150,9 +141,8 @@ public class HttpAccessLogConfiguration {
 	/**
 	 * Returns the token used to authenticate against the HTTP endpoint.
 	 * <p>
-	 * Must be configured with JVM parameter
-	 * <code>httpaccesslogvalve.token</code> or environment variable
-	 * <code>HTTPACCESSLOGVALVE_TOKEN</code>.
+	 * Must be configured with JVM parameter <code>httpaccesslogvalve.token</code>
+	 * or environment variable <code>HTTPACCESSLOGVALVE_TOKEN</code>.
 	 * 
 	 * @return The token to authenticate with.
 	 */
@@ -163,9 +153,9 @@ public class HttpAccessLogConfiguration {
 	/**
 	 * Returns the name of the logging host.
 	 * <p>
-	 * Can be configured with JVM parameter <code>httpaccesslogvalve.host</code>
-	 * or environment variable <code>HTTPACCESSLOGVALVE_TOKEN</code>. If no
-	 * value is provided, it defaults to local hostname.
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.host</code> or
+	 * environment variable <code>HTTPACCESSLOGVALVE_TOKEN</code>. If no value is
+	 * provided, it defaults to local hostname.
 	 * 
 	 * @return The name of the logging host.
 	 */
@@ -176,10 +166,9 @@ public class HttpAccessLogConfiguration {
 	/**
 	 * Returns the index to log to.
 	 * <p>
-	 * Can be configured with JVM parameter
-	 * <code>httpaccesslogvalve.index</code> or environment variable
-	 * <code>HTTPACCESSLOGVALVE_INDEX</code>. If no value is provided, this
-	 * value is <code>null</code> and the default index will be used.
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.index</code> or
+	 * environment variable <code>HTTPACCESSLOGVALVE_INDEX</code>. If no value is
+	 * provided, this value is <code>null</code> and the default index will be used.
 	 * 
 	 * @return The name of the logging host.
 	 */
@@ -190,10 +179,9 @@ public class HttpAccessLogConfiguration {
 	/**
 	 * Returns the name of the source of the logged data.
 	 * <p>
-	 * Can be configured with JVM parameter
-	 * <code>httpaccesslogvalve.source</code> or environment variable
-	 * <code>HTTPACCESSLOGVALVE_SOURCE</code>. If no value is provided, it
-	 * defaults to "HttpAccessLogValve".
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.source</code>
+	 * or environment variable <code>HTTPACCESSLOGVALVE_SOURCE</code>. If no value
+	 * is provided, it defaults to "HttpAccessLogValve".
 	 * 
 	 * @return The name of the logging host.
 	 */
@@ -202,13 +190,12 @@ public class HttpAccessLogConfiguration {
 	}
 
 	/**
-	 * Returns the length of the queue. A longer queue reduces the probability
-	 * of discarded messages, but consumes more memory.
+	 * Returns the length of the queue. A longer queue reduces the probability of
+	 * discarded messages, but consumes more memory.
 	 * <p>
-	 * Can be configured with JVM parameter
-	 * <code>httpaccesslogvalve.queue</code> or environment variable
-	 * <code>HTTPACCESSLOGVALVE_QUEUE</code>. If no value is provided, it
-	 * defaults to 1000.
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.queue</code> or
+	 * environment variable <code>HTTPACCESSLOGVALVE_QUEUE</code>. If no value is
+	 * provided, it defaults to 1000.
 	 * 
 	 * @return The name of the logging host.
 	 */
@@ -217,13 +204,12 @@ public class HttpAccessLogConfiguration {
 	}
 
 	/**
-	 * Returns the time to wait for outstanding events to be sent after a
-	 * shutdown has been initiated, in seconds.
+	 * Returns the time to wait for outstanding events to be sent after a shutdown
+	 * has been initiated, in seconds.
 	 * <p>
-	 * Can be configured with JVM parameter
-	 * <code>httpaccesslogvalve.timeout</code> or environment variable
-	 * <code>HTTPACCESSLOGVALVE_TIMEOUT</code>. If no value is provided, it
-	 * defaults to 30 seconds.
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.timeout</code>
+	 * or environment variable <code>HTTPACCESSLOGVALVE_TIMEOUT</code>. If no value
+	 * is provided, it defaults to 30 seconds.
 	 * 
 	 * @return The name of the logging host.
 	 */

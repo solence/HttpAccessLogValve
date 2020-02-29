@@ -38,7 +38,6 @@ public class HttpAccessLogHttpConn {
 				conn = (HttpsURLConnection) config.getEndpointUrl().openConnection();
 			} else {
 				conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
-				log.warn("Using unencrypted http, consider switching to https");
 			}
 
 			// Connection properties
