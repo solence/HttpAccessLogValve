@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import org.apache.catalina.AccessLog;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -31,14 +29,7 @@ public class HttpAccessLogHttpConn {
 
 	public boolean sendMessage(String message) {
 		try {
-			HttpURLConnection conn;
-
-			// Allow HTTPS and HTTP
-			if ("https".equals(config.getEndpointUrl().getProtocol())) {
-				conn = (HttpsURLConnection) config.getEndpointUrl().openConnection();
-			} else {
-				conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
-			}
+			HttpURLConnection conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
 
 			// Connection properties
 			conn.setConnectTimeout(60000);
@@ -64,7 +55,7 @@ public class HttpAccessLogHttpConn {
 			return target.isResponseOk(conn.getResponseCode(), response);
 
 		} catch (IOException e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
 			return false;
 		}
 	}

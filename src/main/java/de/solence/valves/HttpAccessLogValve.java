@@ -19,7 +19,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * 
+ * The main class of the HTTP Access Log Valve, implementing the necessary
+ * interface to Tomcat.
  * 
  * @author Robin Seggelmann
  *
@@ -40,8 +41,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	/**
 	 * Protected constructor to inject configuration for unit tests.
 	 * 
-	 * @param config
-	 *                   The {@link HttpAccessLogConfiguration} to inject.
+	 * @param config The {@link HttpAccessLogConfiguration} to inject.
 	 */
 	protected HttpAccessLogValve(HttpAccessLogConfiguration config) {
 		this.config = config;
@@ -66,8 +66,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		executor = Executors.newSingleThreadScheduledExecutor();
 
 		// Check every 250 ms for new events to send
-		executor.scheduleWithFixedDelay(new HttpAccessLogSender(config, queue),
-				250L, 250L, TimeUnit.MILLISECONDS);
+		executor.scheduleWithFixedDelay(new HttpAccessLogSender(config, queue), 250L, 250L, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -81,8 +80,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		if (executor != null) {
 			executor.shutdown();
 			try {
-				executor.awaitTermination(config.getTimeout(),
-						TimeUnit.SECONDS);
+				executor.awaitTermination(config.getTimeout(), TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
@@ -99,8 +97,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	}
 
 	@Override
-	public void invoke(Request request, Response response)
-			throws IOException, ServletException {
+	public void invoke(Request request, Response response) throws IOException, ServletException {
 
 		Valve nextValve = getNext();
 		if (nextValve != null) {

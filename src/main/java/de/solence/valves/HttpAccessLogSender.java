@@ -3,6 +3,10 @@ package de.solence.valves;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.catalina.AccessLog;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Sends messages of log events to endpoint.
  * <p>
@@ -16,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class HttpAccessLogSender implements Runnable {
+	private static final Log log = LogFactory.getLog(AccessLog.class);
 	private final HttpAccessLogConfiguration config;
 	private final HttpAccessLogHttpConn conn;
 	private final BlockingQueue<HttpAccessLogEvent> queue;
@@ -56,6 +61,7 @@ public class HttpAccessLogSender implements Runnable {
 					Thread.currentThread().interrupt();
 					// Thread has been interrupted, so give up. This likely results in lost events,
 					// but there is not much that can be done to avoid that.
+					log.error("Received interrupt while still trying to send events");
 					return;
 				}
 
