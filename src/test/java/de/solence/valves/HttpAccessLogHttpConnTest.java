@@ -16,6 +16,8 @@ import java.net.URL;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import de.solence.valves.util.TestSocket;
+
 public class HttpAccessLogHttpConnTest {
 	private static final String CONTENT_TYPE = "application/json";
 	private static final String TOKEN = "testToken";
@@ -25,9 +27,11 @@ public class HttpAccessLogHttpConnTest {
 	public void echo() throws MalformedURLException {
 		HttpAccessLogTarget target = mockHttpAccessLogTarget();
 
-		HttpAccessLogConfiguration config = mock(HttpAccessLogConfiguration.class);
+		HttpAccessLogConfiguration config = mock(
+				HttpAccessLogConfiguration.class);
 		when(config.getTarget()).thenReturn(target);
-		when(config.getEndpointUrl()).thenReturn(new URL("https://postman-echo.com/post"));
+		when(config.getEndpointUrl())
+				.thenReturn(new URL("https://postman-echo.com/post"));
 		when(config.getAuthToken()).thenReturn(TOKEN);
 
 		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
@@ -46,10 +50,33 @@ public class HttpAccessLogHttpConnTest {
 	public void endpointInvalid() throws MalformedURLException {
 		HttpAccessLogTarget target = mockHttpAccessLogTarget();
 
-		HttpAccessLogConfiguration config = mock(HttpAccessLogConfiguration.class);
+		HttpAccessLogConfiguration config = mock(
+				HttpAccessLogConfiguration.class);
 		when(config.getTarget()).thenReturn(target);
-		when(config.getEndpointUrl()).thenReturn(new URL("https://invalidHost"));
+		when(config.getEndpointUrl())
+				.thenReturn(new URL("https://invalidHost"));
 		when(config.getAuthToken()).thenReturn(TOKEN);
+
+		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
+		assertFalse(conn.sendMessage(JSON));
+	}
+
+	@Test
+	public void timeout() throws MalformedURLException {
+		int port = 54321;
+		TestSocket socket = new TestSocket(port, 3000);
+		Thread socketThread = new Thread(socket);
+		socketThread.start();
+
+		HttpAccessLogTarget target = mockHttpAccessLogTarget();
+
+		HttpAccessLogConfiguration config = mock(
+				HttpAccessLogConfiguration.class);
+		when(config.getTarget()).thenReturn(target);
+		when(config.getEndpointUrl())
+				.thenReturn(new URL("http://localhost:" + port));
+		when(config.getAuthToken()).thenReturn(TOKEN);
+		when(config.getTimeout()).thenReturn(1000);
 
 		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
 		assertFalse(conn.sendMessage(JSON));
@@ -58,7 +85,8 @@ public class HttpAccessLogHttpConnTest {
 	private HttpAccessLogTarget mockHttpAccessLogTarget() {
 		HttpAccessLogTarget target = mock(HttpAccessLogTarget.class);
 		when(target.getContentType()).thenReturn(CONTENT_TYPE);
-		when(target.getAuthenticationHeader(TOKEN)).thenReturn("Bearer " + TOKEN);
+		when(target.getAuthenticationHeader(TOKEN))
+				.thenReturn("Bearer " + TOKEN);
 		when(target.isResponseOk(eq(200), anyString())).thenReturn(true);
 		when(target.isResponseOk(not(eq(200)), anyString())).thenReturn(false);
 		return target;
