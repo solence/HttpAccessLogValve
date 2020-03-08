@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +11,7 @@ import org.apache.catalina.connector.Response;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogEvent {
+public class Event {
 	private final LocalDateTime time;
 	private final String index;
 	private final String host;
@@ -32,14 +32,14 @@ public class HttpAccessLogEvent {
 	 * Does nothing but storing the relevant data to minimize delay at runtime.
 	 * 
 	 * @param config
-	 *                     The {@link HttpAccessLogConfiguration} providing
+	 *                     The {@link Configuration} providing
 	 *                     configured data.
 	 * @param request
 	 *                     The incoming {@link Request} providing client data.
 	 * @param response
 	 *                     The outgoing {@link Response} providing server data.
 	 */
-	public HttpAccessLogEvent(HttpAccessLogConfiguration config,
+	public Event(Configuration config,
 			Request request, Response response, long processingTime) {
 		this.time = LocalDateTime.now();
 		this.index = config.getIndex();

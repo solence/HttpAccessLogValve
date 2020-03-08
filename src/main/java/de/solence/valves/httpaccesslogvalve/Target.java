@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 /**
  * Interface to support different logging systems as targets. Allows to
@@ -8,7 +8,7 @@ package de.solence.valves;
  * @author Robin Seggelmann
  *
  */
-public interface HttpAccessLogTarget {
+public interface Target {
 
 	/**
 	 * The content type used for an event message in the HTTP header.
@@ -37,10 +37,10 @@ public interface HttpAccessLogTarget {
 	 * Creates a message from an event with the format expected by the logging
 	 * system.
 	 * 
-	 * @param event The {@link HttpAccessLogEvent} to send.
+	 * @param event The {@link Event} to send.
 	 * @return A string with a compatible message for the endpoint.
 	 */
-	public String getMessage(HttpAccessLogEvent event);
+	public String getMessage(Event event);
 
 	/**
 	 * Check if the response of the logging system indicates successful delivery of

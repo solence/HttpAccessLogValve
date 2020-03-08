@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -9,6 +9,8 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+
+import de.solence.valves.httpaccesslogvalve.targets.Splunk;
 
 /**
  * Reads and stores the configuration from JVM parameters or environment
@@ -32,9 +34,9 @@ import org.apache.juli.logging.LogFactory;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogConfiguration {
+public class Configuration {
 	private static final Log log = LogFactory.getLog(AccessLog.class);
-	private final HttpAccessLogTarget target;
+	private final Target target;
 	private final URL endpointUrl;
 	private final String authToken;
 	private final String host;
@@ -52,9 +54,9 @@ public class HttpAccessLogConfiguration {
 	 * @throws LifecycleException Thrown for invalid or missing configuration
 	 *                            values.
 	 */
-	public HttpAccessLogConfiguration() throws LifecycleException {
+	public Configuration() throws LifecycleException {
 		// Currently only Splunk is supported
-		target = new HttpAccessLogSplunk();
+		target = new Splunk();
 
 		// Read configured endpoint URL and store it as an URL object. This
 		// fails in case a malformed URL is provided.
@@ -124,7 +126,7 @@ public class HttpAccessLogConfiguration {
 	 * 
 	 * @return The implementation of the target system.
 	 */
-	public HttpAccessLogTarget getTarget() {
+	public Target getTarget() {
 		return target;
 	}
 

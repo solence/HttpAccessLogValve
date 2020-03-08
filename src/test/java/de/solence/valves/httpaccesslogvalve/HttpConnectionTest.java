@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,25 +16,28 @@ import java.net.URL;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import de.solence.valves.httpaccesslogvalve.Configuration;
+import de.solence.valves.httpaccesslogvalve.HttpConnection;
+import de.solence.valves.httpaccesslogvalve.Target;
 import de.solence.valves.util.TestSocket;
 
-public class HttpAccessLogHttpConnTest {
+public class HttpConnectionTest {
 	private static final String CONTENT_TYPE = "application/json";
 	private static final String TOKEN = "testToken";
 	private static final String JSON = "{\"msg\":\"test\"}";
 
 	@Test
 	public void echo() throws MalformedURLException {
-		HttpAccessLogTarget target = mockHttpAccessLogTarget();
+		Target target = mockHttpAccessLogTarget();
 
-		HttpAccessLogConfiguration config = mock(
-				HttpAccessLogConfiguration.class);
+		Configuration config = mock(
+				Configuration.class);
 		when(config.getTarget()).thenReturn(target);
 		when(config.getEndpointUrl())
 				.thenReturn(new URL("https://postman-echo.com/post"));
 		when(config.getAuthToken()).thenReturn(TOKEN);
 
-		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
+		HttpConnection conn = new HttpConnection(config);
 		assertTrue(conn.sendMessage(JSON));
 
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -48,16 +51,16 @@ public class HttpAccessLogHttpConnTest {
 
 	@Test
 	public void endpointInvalid() throws MalformedURLException {
-		HttpAccessLogTarget target = mockHttpAccessLogTarget();
+		Target target = mockHttpAccessLogTarget();
 
-		HttpAccessLogConfiguration config = mock(
-				HttpAccessLogConfiguration.class);
+		Configuration config = mock(
+				Configuration.class);
 		when(config.getTarget()).thenReturn(target);
 		when(config.getEndpointUrl())
 				.thenReturn(new URL("https://invalidHost"));
 		when(config.getAuthToken()).thenReturn(TOKEN);
 
-		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
+		HttpConnection conn = new HttpConnection(config);
 		assertFalse(conn.sendMessage(JSON));
 	}
 
@@ -68,22 +71,22 @@ public class HttpAccessLogHttpConnTest {
 		Thread socketThread = new Thread(socket);
 		socketThread.start();
 
-		HttpAccessLogTarget target = mockHttpAccessLogTarget();
+		Target target = mockHttpAccessLogTarget();
 
-		HttpAccessLogConfiguration config = mock(
-				HttpAccessLogConfiguration.class);
+		Configuration config = mock(
+				Configuration.class);
 		when(config.getTarget()).thenReturn(target);
 		when(config.getEndpointUrl())
 				.thenReturn(new URL("http://localhost:" + port));
 		when(config.getAuthToken()).thenReturn(TOKEN);
 		when(config.getTimeout()).thenReturn(1000);
 
-		HttpAccessLogHttpConn conn = new HttpAccessLogHttpConn(config);
+		HttpConnection conn = new HttpConnection(config);
 		assertFalse(conn.sendMessage(JSON));
 	}
 
-	private HttpAccessLogTarget mockHttpAccessLogTarget() {
-		HttpAccessLogTarget target = mock(HttpAccessLogTarget.class);
+	private Target mockHttpAccessLogTarget() {
+		Target target = mock(Target.class);
 		when(target.getContentType()).thenReturn(CONTENT_TYPE);
 		when(target.getAuthenticationHeader(TOKEN))
 				.thenReturn("Bearer " + TOKEN);

@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -19,21 +19,21 @@ import org.apache.juli.logging.LogFactory;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogSender implements Runnable {
+public class Sender implements Runnable {
 	private static final Log log = LogFactory.getLog(AccessLog.class);
-	private final HttpAccessLogConfiguration config;
-	private final HttpAccessLogHttpConn conn;
-	private final BlockingQueue<HttpAccessLogEvent> queue;
+	private final Configuration config;
+	private final HttpConnection conn;
+	private final BlockingQueue<Event> queue;
 
 	/**
 	 * Constructor.
 	 * 
-	 * @param config The {@link HttpAccessLogConfiguration} for connection details.
+	 * @param config The {@link Configuration} for connection details.
 	 * @param queue  The event queue to send messages from.
 	 */
-	public HttpAccessLogSender(HttpAccessLogConfiguration config, BlockingQueue<HttpAccessLogEvent> queue) {
+	public Sender(Configuration config, BlockingQueue<Event> queue) {
 		this.config = config;
-		this.conn = new HttpAccessLogHttpConn(config);
+		this.conn = new HttpConnection(config);
 		this.queue = queue;
 	}
 
@@ -84,7 +84,7 @@ public class HttpAccessLogSender implements Runnable {
 			// otherwise we wouldn't have made it here. Wait up to 100 ms
 			// for further events to avoid sending single event, like Nagle's
 			// algorithm.
-			HttpAccessLogEvent event = null;
+			Event event = null;
 			try {
 				event = queue.poll(100, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {

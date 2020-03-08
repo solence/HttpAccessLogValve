@@ -18,6 +18,10 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+import de.solence.valves.httpaccesslogvalve.Configuration;
+import de.solence.valves.httpaccesslogvalve.Event;
+import de.solence.valves.httpaccesslogvalve.Sender;
+
 /**
  * The main class of the HTTP Access Log Valve, implementing the necessary
  * interface to Tomcat.
@@ -27,9 +31,9 @@ import org.apache.juli.logging.LogFactory;
  */
 public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	private static final Log log = LogFactory.getLog(AccessLog.class);
-	private ArrayBlockingQueue<HttpAccessLogEvent> queue;
+	private ArrayBlockingQueue<Event> queue;
 	private ScheduledExecutorService executor;
-	private HttpAccessLogConfiguration config;
+	private Configuration config;
 
 	/**
 	 * Constructor.
@@ -41,9 +45,9 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	/**
 	 * Protected constructor to inject configuration for unit tests.
 	 * 
-	 * @param config The {@link HttpAccessLogConfiguration} to inject.
+	 * @param config The {@link Configuration} to inject.
 	 */
-	protected HttpAccessLogValve(HttpAccessLogConfiguration config) {
+	protected HttpAccessLogValve(Configuration config) {
 		this.config = config;
 	}
 
@@ -54,7 +58,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		setState(LifecycleState.STARTING);
 
 		if (config == null) {
-			config = new HttpAccessLogConfiguration();
+			config = new Configuration();
 		}
 
 		log.info("URL: " + config.getEndpointUrl());
@@ -66,7 +70,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		executor = Executors.newSingleThreadScheduledExecutor();
 
 		// Check every 250 ms for new events to send
-		executor.scheduleWithFixedDelay(new HttpAccessLogSender(config, queue), 250L, 250L, TimeUnit.MILLISECONDS);
+		executor.scheduleWithFixedDelay(new Sender(config, queue), 250L, 250L, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -90,7 +94,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	@Override
 	public void log(Request request, Response response, long time) {
 		try {
-			queue.add(new HttpAccessLogEvent(config, request, response, time));
+			queue.add(new Event(config, request, response, time));
 		} catch (IllegalStateException e) {
 			log.error(e.getMessage(), e);
 		}

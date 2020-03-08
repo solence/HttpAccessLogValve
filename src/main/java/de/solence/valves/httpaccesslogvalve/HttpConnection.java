@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,12 +17,12 @@ import org.apache.juli.logging.LogFactory;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogHttpConn {
+public class HttpConnection {
 	private static final Log log = LogFactory.getLog(AccessLog.class);
-	private HttpAccessLogConfiguration config;
-	private HttpAccessLogTarget target;
+	private Configuration config;
+	private Target target;
 
-	public HttpAccessLogHttpConn(HttpAccessLogConfiguration config) {
+	public HttpConnection(Configuration config) {
 		this.config = config;
 		this.target = config.getTarget();
 	}

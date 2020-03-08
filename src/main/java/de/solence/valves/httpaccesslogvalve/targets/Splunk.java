@@ -1,10 +1,14 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve.targets;
 
 import java.time.ZoneId;
 import java.util.Locale;
 
+import de.solence.valves.httpaccesslogvalve.Event;
+import de.solence.valves.httpaccesslogvalve.JsonBuilder;
+import de.solence.valves.httpaccesslogvalve.Target;
+
 /**
- * Implements {@link HttpAccessLogTarget} for Splunk. Provides an authentication
+ * Implements {@link Target} for Splunk. Provides an authentication
  * method and message format compatible with Splunk HTTP Event Collectors (HEC).
  * <p>
  * Splunk is a registered trademark of Splunk Inc.
@@ -12,7 +16,7 @@ import java.util.Locale;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogSplunk implements HttpAccessLogTarget {
+public class Splunk implements Target {
 
 	/**
 	 * Returns the content type, always use JSON.
@@ -45,8 +49,8 @@ public class HttpAccessLogSplunk implements HttpAccessLogTarget {
 	 * @return A JSON message with a Splunk event.
 	 */
 	@Override
-	public String getMessage(HttpAccessLogEvent event) {
-		HttpAccessLogJsonBuilder json = new HttpAccessLogJsonBuilder();
+	public String getMessage(Event event) {
+		JsonBuilder json = new JsonBuilder();
 
 		double epoch = event.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000.0;
 

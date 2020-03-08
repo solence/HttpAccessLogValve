@@ -1,4 +1,4 @@
-package de.solence.valves;
+package de.solence.valves.httpaccesslogvalve;
 
 /**
  * A simple JSON builder based on a StringBuilder. Only the bare minimum JSON is
@@ -8,14 +8,14 @@ package de.solence.valves;
  * @author Robin Seggelmann
  *
  */
-public class HttpAccessLogJsonBuilder {
+public class JsonBuilder {
 	private StringBuilder sb;
 	private boolean needSeparator;
 
 	/**
 	 * Constructor.
 	 */
-	public HttpAccessLogJsonBuilder() {
+	public JsonBuilder() {
 		sb = new StringBuilder();
 		needSeparator = false;
 	}
@@ -27,7 +27,7 @@ public class HttpAccessLogJsonBuilder {
 	 * @param value The value as {@link String}.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder append(String key, String value) {
+	public JsonBuilder append(String key, String value) {
 		addSeparator();
 		sb.append('"').append(key).append('"');
 		sb.append(':');
@@ -43,7 +43,7 @@ public class HttpAccessLogJsonBuilder {
 	 * @param value The value as {@link Long}.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder append(String key, long value) {
+	public JsonBuilder append(String key, long value) {
 		addSeparator();
 		sb.append('"').append(key).append('"');
 		sb.append(':');
@@ -60,7 +60,7 @@ public class HttpAccessLogJsonBuilder {
 	 * @param key The name of the object.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder startObject(String key) {
+	public JsonBuilder startObject(String key) {
 		addSeparator();
 		if (key != null) {
 			sb.append('"').append(key).append('"');
@@ -76,7 +76,7 @@ public class HttpAccessLogJsonBuilder {
 	 * 
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder endObject() {
+	public JsonBuilder endObject() {
 		sb.append('}');
 		needSeparator = true;
 		return this;
@@ -90,7 +90,7 @@ public class HttpAccessLogJsonBuilder {
 	 * @param key The name of the object.
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder startArray(String key) {
+	public JsonBuilder startArray(String key) {
 		addSeparator();
 		if (key != null) {
 			sb.append('"').append(key).append('"');
@@ -106,7 +106,7 @@ public class HttpAccessLogJsonBuilder {
 	 * 
 	 * @return This object for builder pattern.
 	 */
-	public HttpAccessLogJsonBuilder endArray() {
+	public JsonBuilder endArray() {
 		sb.append(']');
 		needSeparator = true;
 		return this;
