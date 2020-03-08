@@ -42,6 +42,7 @@ public class HttpAccessLogConfiguration {
 	private final String source;
 	private final int queueLength;
 	private final int timeout;
+	private final int shutdownTimeout;
 
 	/**
 	 * Constructor.
@@ -90,7 +91,8 @@ public class HttpAccessLogConfiguration {
 		source = getJvmOrEnvValue("source", "HttpAccessLogValve", false);
 
 		queueLength = Integer.parseUnsignedInt(getJvmOrEnvValue("queue", "1000", false));
-		timeout = Integer.parseUnsignedInt(getJvmOrEnvValue("timeout", "30", false));
+		timeout = Integer.parseUnsignedInt(getJvmOrEnvValue("timeout", "60000", false));
+		shutdownTimeout = Integer.parseUnsignedInt(getJvmOrEnvValue("shutdowntimeout", "30", false));
 	}
 
 	private String getJvmOrEnvValue(String name, String defaultValue, boolean mandatory) throws LifecycleException {
@@ -170,7 +172,7 @@ public class HttpAccessLogConfiguration {
 	 * environment variable <code>HTTPACCESSLOGVALVE_INDEX</code>. If no value is
 	 * provided, this value is <code>null</code> and the default index will be used.
 	 * 
-	 * @return The name of the logging host.
+	 * @return The name of the index.
 	 */
 	public String getIndex() {
 		return index;
@@ -183,7 +185,7 @@ public class HttpAccessLogConfiguration {
 	 * or environment variable <code>HTTPACCESSLOGVALVE_SOURCE</code>. If no value
 	 * is provided, it defaults to "HttpAccessLogValve".
 	 * 
-	 * @return The name of the logging host.
+	 * @return The name of the source.
 	 */
 	public String getSource() {
 		return source;
@@ -197,24 +199,37 @@ public class HttpAccessLogConfiguration {
 	 * environment variable <code>HTTPACCESSLOGVALVE_QUEUE</code>. If no value is
 	 * provided, it defaults to 1000.
 	 * 
-	 * @return The name of the logging host.
+	 * @return The maximum length of the queue
 	 */
 	public int getQueueLength() {
 		return queueLength;
 	}
 
 	/**
-	 * Returns the time to wait for outstanding events to be sent after a shutdown
-	 * has been initiated, in seconds.
+	 * Returns the socket timeout used when connecting to the endpoint.
 	 * <p>
 	 * Can be configured with JVM parameter <code>httpaccesslogvalve.timeout</code>
 	 * or environment variable <code>HTTPACCESSLOGVALVE_TIMEOUT</code>. If no value
-	 * is provided, it defaults to 30 seconds.
+	 * is provided, it defaults to 1 minute.
 	 * 
-	 * @return The name of the logging host.
+	 * @return The timeout in milliseconds.
 	 */
 	public int getTimeout() {
 		return timeout;
+	}
+
+	/**
+	 * Returns the time to wait for outstanding events to be sent after a shutdown
+	 * has been initiated, in seconds.
+	 * <p>
+	 * Can be configured with JVM parameter <code>httpaccesslogvalve.shutdowntimeout</code>
+	 * or environment variable <code>HTTPACCESSLOGVALVE_SHUTDOWNTIMEOUT</code>. If no value
+	 * is provided, it defaults to 30 seconds.
+	 * 
+	 * @return The timeout in seconds.
+	 */
+	public int getShutdownTimeout() {
+		return shutdownTimeout;
 	}
 
 }

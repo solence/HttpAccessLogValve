@@ -80,7 +80,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		if (executor != null) {
 			executor.shutdown();
 			try {
-				executor.awaitTermination(config.getTimeout(), TimeUnit.SECONDS);
+				executor.awaitTermination(config.getShutdownTimeout(), TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}

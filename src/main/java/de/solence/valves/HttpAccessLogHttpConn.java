@@ -32,8 +32,8 @@ public class HttpAccessLogHttpConn {
 			HttpURLConnection conn = (HttpURLConnection) config.getEndpointUrl().openConnection();
 
 			// Connection properties
-			conn.setConnectTimeout(60000);
-			conn.setReadTimeout(60000);
+			conn.setConnectTimeout(config.getTimeout());
+			conn.setReadTimeout(config.getTimeout());
 			conn.setDoOutput(true);
 
 			// Headers

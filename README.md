@@ -38,7 +38,8 @@ The following table lists all possible configuration parameters. They can either
 |httpaccesslogvalve.index|HTTPACCESSLOGVALVE_INDEX|TODO|
 |httpaccesslogvalve.source|HTTPACCESSLOGVALVE_SOURCE|TODO|
 |httpaccesslogvalve.queue|HTTPACCESSLOGVALVE_QUEUE|The length of the queue of log events waiting to be sent. A longer queue is more likely to guarantee delivery of log events, when the network is slow or the endpoint unstable. It also increases memory consumtion. Log events will be lost when the queue is full. Defaults to 1000. |
-|httpaccesslogvalve.timeout|HTTPACCESSLOGVALVE_TIMEOUT|The time to wait after a shutdown has been initiated, until log events still in the queue have been sent. Defaults to 30 seconds|
+|httpaccesslogvalve.timeout|HTTPACCESSLOGVALVE_TIMEOUT|The timeout used when connecting to the endpoint. Defaults to 1 minute|
+|httpaccesslogvalve.shutdowntimeout|HTTPACCESSLOGVALVE_SHUTDOWNTIMEOUT|The time to wait after a shutdown has been initiated, until log events still in the queue have been sent. Defaults to 30 seconds|
 
 ### Example with JVM parameters
 
