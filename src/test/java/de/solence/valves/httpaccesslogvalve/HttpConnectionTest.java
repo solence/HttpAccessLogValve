@@ -28,7 +28,7 @@ public class HttpConnectionTest {
 
 	@Test
 	public void echo() throws MalformedURLException {
-		Target target = mockHttpAccessLogTarget();
+		Target target = mockTarget();
 
 		Configuration config = mock(
 				Configuration.class);
@@ -51,7 +51,7 @@ public class HttpConnectionTest {
 
 	@Test
 	public void endpointInvalid() throws MalformedURLException {
-		Target target = mockHttpAccessLogTarget();
+		Target target = mockTarget();
 
 		Configuration config = mock(
 				Configuration.class);
@@ -71,7 +71,7 @@ public class HttpConnectionTest {
 		Thread socketThread = new Thread(socket);
 		socketThread.start();
 
-		Target target = mockHttpAccessLogTarget();
+		Target target = mockTarget();
 
 		Configuration config = mock(
 				Configuration.class);
@@ -85,7 +85,7 @@ public class HttpConnectionTest {
 		assertFalse(conn.sendMessage(JSON));
 	}
 
-	private Target mockHttpAccessLogTarget() {
+	private Target mockTarget() {
 		Target target = mock(Target.class);
 		when(target.getContentType()).thenReturn(CONTENT_TYPE);
 		when(target.getAuthenticationHeader(TOKEN))

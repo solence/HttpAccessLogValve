@@ -13,9 +13,6 @@ import org.apache.catalina.connector.Response;
  */
 public class Event {
 	private final LocalDateTime time;
-	private final String index;
-	private final String host;
-	private final String source;
 	private final String remoteHost;
 	private final String requestMethod;
 	private final String requestUri;
@@ -31,20 +28,11 @@ public class Event {
 	 * <p>
 	 * Does nothing but storing the relevant data to minimize delay at runtime.
 	 * 
-	 * @param config
-	 *                     The {@link Configuration} providing
-	 *                     configured data.
-	 * @param request
-	 *                     The incoming {@link Request} providing client data.
-	 * @param response
-	 *                     The outgoing {@link Response} providing server data.
+	 * @param request  The incoming {@link Request} providing client data.
+	 * @param response The outgoing {@link Response} providing server data.
 	 */
-	public Event(Configuration config,
-			Request request, Response response, long processingTime) {
+	public Event(Request request, Response response, long processingTime) {
 		this.time = LocalDateTime.now();
-		this.index = config.getIndex();
-		this.host = config.getHost();
-		this.source = config.getSource();
 		this.remoteHost = request.getRemoteHost();
 		this.requestMethod = request.getMethod();
 		this.requestUri = request.getRequestURI();
@@ -58,18 +46,6 @@ public class Event {
 
 	public LocalDateTime getTime() {
 		return time;
-	}
-
-	public String getIndex() {
-		return index;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public String getSource() {
-		return source;
 	}
 
 	public String getRemoteHost() {

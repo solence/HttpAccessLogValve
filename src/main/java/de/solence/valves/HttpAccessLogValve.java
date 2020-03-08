@@ -20,6 +20,7 @@ import org.apache.juli.logging.LogFactory;
 
 import de.solence.valves.httpaccesslogvalve.Configuration;
 import de.solence.valves.httpaccesslogvalve.Event;
+import de.solence.valves.httpaccesslogvalve.HttpConnection;
 import de.solence.valves.httpaccesslogvalve.Sender;
 
 /**
@@ -66,11 +67,12 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 		log.info("Source: " + config.getSource());
 
 		queue = new ArrayBlockingQueue<>(config.getQueueLength());
+		HttpConnection conn = new HttpConnection(config);
 
 		executor = Executors.newSingleThreadScheduledExecutor();
 
 		// Check every 250 ms for new events to send
-		executor.scheduleWithFixedDelay(new Sender(config, queue), 250L, 250L, TimeUnit.MILLISECONDS);
+		executor.scheduleWithFixedDelay(new Sender(config, conn, queue), 250L, 250L, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -94,7 +96,7 @@ public class HttpAccessLogValve extends ValveBase implements AccessLog {
 	@Override
 	public void log(Request request, Response response, long time) {
 		try {
-			queue.add(new Event(config, request, response, time));
+			queue.add(new Event(request, response, time));
 		} catch (IllegalStateException e) {
 			log.error(e.getMessage(), e);
 		}

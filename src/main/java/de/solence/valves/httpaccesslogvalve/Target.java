@@ -37,10 +37,11 @@ public interface Target {
 	 * Creates a message from an event with the format expected by the logging
 	 * system.
 	 * 
-	 * @param event The {@link Event} to send.
+	 * @param config The {@link Configuration} to use.
+	 * @param event  The {@link Event} to send.
 	 * @return A string with a compatible message for the endpoint.
 	 */
-	public String getMessage(Event event);
+	public String getMessage(Configuration config, Event event);
 
 	/**
 	 * Check if the response of the logging system indicates successful delivery of

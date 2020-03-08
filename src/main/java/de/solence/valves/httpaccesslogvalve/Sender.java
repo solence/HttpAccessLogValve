@@ -31,9 +31,9 @@ public class Sender implements Runnable {
 	 * @param config The {@link Configuration} for connection details.
 	 * @param queue  The event queue to send messages from.
 	 */
-	public Sender(Configuration config, BlockingQueue<Event> queue) {
+	public Sender(Configuration config, HttpConnection conn, BlockingQueue<Event> queue) {
 		this.config = config;
-		this.conn = new HttpConnection(config);
+		this.conn = conn;
 		this.queue = queue;
 	}
 
@@ -102,7 +102,7 @@ public class Sender implements Runnable {
 				message.append(',');
 			}
 
-			message.append(config.getTarget().getMessage(event));
+			message.append(config.getTarget().getMessage(config, event));
 		}
 		message.append(']');
 

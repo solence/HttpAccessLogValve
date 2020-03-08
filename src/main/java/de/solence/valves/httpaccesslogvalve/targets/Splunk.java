@@ -3,13 +3,14 @@ package de.solence.valves.httpaccesslogvalve.targets;
 import java.time.ZoneId;
 import java.util.Locale;
 
+import de.solence.valves.httpaccesslogvalve.Configuration;
 import de.solence.valves.httpaccesslogvalve.Event;
 import de.solence.valves.httpaccesslogvalve.JsonBuilder;
 import de.solence.valves.httpaccesslogvalve.Target;
 
 /**
- * Implements {@link Target} for Splunk. Provides an authentication
- * method and message format compatible with Splunk HTTP Event Collectors (HEC).
+ * Implements {@link Target} for Splunk. Provides an authentication method and
+ * message format compatible with Splunk HTTP Event Collectors (HEC).
  * <p>
  * Splunk is a registered trademark of Splunk Inc.
  * 
@@ -49,7 +50,7 @@ public class Splunk implements Target {
 	 * @return A JSON message with a Splunk event.
 	 */
 	@Override
-	public String getMessage(Event event) {
+	public String getMessage(Configuration config, Event event) {
 		JsonBuilder json = new JsonBuilder();
 
 		double epoch = event.getTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000.0;
@@ -57,11 +58,11 @@ public class Splunk implements Target {
 		// metadata
 		json.startObject(null);
 		json.append("time", String.format(Locale.US, "%.3f", epoch));
-		if (event.getIndex() != null) {
-			json.append("index", event.getIndex());
+		if (config.getIndex() != null) {
+			json.append("index", config.getIndex());
 		}
-		json.append("host", event.getHost());
-		json.append("source", event.getSource());
+		json.append("host", config.getHost());
+		json.append("source", config.getSource());
 		json.append("sourcetype", "access");
 		// begin event
 		json.startObject("event");
